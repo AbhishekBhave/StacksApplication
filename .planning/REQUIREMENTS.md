@@ -85,36 +85,36 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase TBD | Pending |
-| AUTH-02 | Phase TBD | Pending |
-| AUTH-03 | Phase TBD | Pending |
-| AUTH-04 | Phase TBD | Pending |
-| BANK-01 | Phase TBD | Pending |
-| BANK-02 | Phase TBD | Pending |
-| BANK-03 | Phase TBD | Pending |
-| BANK-04 | Phase TBD | Pending |
-| BUDG-01 | Phase TBD | Pending |
-| BUDG-02 | Phase TBD | Pending |
-| BUDG-03 | Phase TBD | Pending |
-| BUDG-04 | Phase TBD | Pending |
-| AFFD-01 | Phase TBD | Pending |
-| AFFD-02 | Phase TBD | Pending |
-| AFFD-03 | Phase TBD | Pending |
-| AFFD-04 | Phase TBD | Pending |
-| AFFD-05 | Phase TBD | Pending |
-| ROST-01 | Phase TBD | Pending |
-| ROST-02 | Phase TBD | Pending |
-| ROST-03 | Phase TBD | Pending |
-| SECU-01 | Phase TBD | Pending |
-| SECU-02 | Phase TBD | Pending |
-| SECU-03 | Phase TBD | Pending |
-| SECU-04 | Phase TBD | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| BANK-01 | Phase 2 | Pending |
+| BANK-02 | Phase 2 | Pending |
+| BANK-03 | Phase 2 | Pending |
+| BANK-04 | Phase 2 | Pending |
+| BUDG-01 | Phase 3 | Pending |
+| BUDG-02 | Phase 3 | Pending |
+| BUDG-03 | Phase 3 | Pending |
+| BUDG-04 | Phase 3 | Pending |
+| AFFD-01 | Phase 4 | Pending |
+| AFFD-02 | Phase 4 | Pending |
+| AFFD-03 | Phase 4 | Pending |
+| AFFD-04 | Phase 4 | Pending |
+| AFFD-05 | Phase 4 | Pending |
+| ROST-01 | Phase 5 | Pending |
+| ROST-02 | Phase 5 | Pending |
+| ROST-03 | Phase 5 | Pending |
+| SECU-01 | Phase 2 | Pending |
+| SECU-02 | Phase 2 | Pending |
+| SECU-03 | Phase 1 | Pending |
+| SECU-04 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 24 total
-- Mapped to phases: 0
-- Unmapped: 24 ⚠
+- Mapped to phases: 24
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-17*
-*Last updated: 2026-04-17 after initial definition*
+*Last updated: 2026-04-17 after roadmap traceability mapping*
