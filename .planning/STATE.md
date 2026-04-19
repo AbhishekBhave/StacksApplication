@@ -26,6 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 
 ## Recent decisions
 
+- **Phase 2 planned (2026-04-19):** five executable plans (`02-PLAN-01` … `02-PLAN-05`) plus `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, and `02-UI-SPEC.md` in `.planning/phases/02-plaid-connection-and-transaction-pipeline/`. Next execution step: `/gsd-execute-phase 2`.
 - Expo app directory created as `stacks-expo` then renamed to `expo/` because `create-expo-app` rejects the package name `expo`.
 - Plans 03 and 04 shipped in one commit to avoid a broken intermediate home route.
 - Plan 05 adds fail-fast env guards in client bootstrap and prestart/pretest checks via `expo/scripts/check-env.js`.
