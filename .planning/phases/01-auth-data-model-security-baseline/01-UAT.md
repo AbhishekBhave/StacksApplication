@@ -8,23 +8,25 @@ source:
   - 01-PLAN-04-SUMMARY.md
   - 01-PLAN-05-SUMMARY.md
 started: 2026-04-19T14:43:59Z
-updated: 2026-04-19T22:15:00Z
+updated: 2026-04-19T23:00:00Z
 ---
 
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 1
-name: Expo app boots with Supabase env configured
+number: 4
+name: Forgot password sends reset email
 expected: |
-  From `expo/` with `.env` containing valid `EXPO_PUBLIC_SUPABASE_URL` and anon/publishable `EXPO_PUBLIC_SUPABASE_ANON_KEY`: `node scripts/check-env.js` exits 0; `npm run start -- --clear` runs past prestart and reaches the Expo dev UI without missing-env red-screen or immediate Supabase URL/key failure.
+  On the forgot-password screen, submitting a valid email triggers Supabase password reset email (or a clear success message), without app errors.
 awaiting: user response
+
+_Note: Tests 5, 7, and 8 are skipped for this round (blocked by Test 6 — onboarding cannot be completed)._
 
 ## Tests
 
 ### 1. Expo app boots with Supabase env configured
 expected: From `expo/` with `.env` containing valid `EXPO_PUBLIC_SUPABASE_URL` and anon/publishable `EXPO_PUBLIC_SUPABASE_ANON_KEY`: `node scripts/check-env.js` exits 0; `npm run start -- --clear` runs past prestart and reaches the Expo dev UI without missing-env red-screen or immediate Supabase URL/key failure.
-result: pending
+result: pass
 
 ### 2. Jest smoke test passes
 expected: `cd expo && npm test -- --ci` completes successfully (green) with the smoke test.
@@ -32,7 +34,7 @@ result: pass
 
 ### 3. Sign up and sign in (email/password)
 expected: In `/(auth)`, switching modes works; sign-up creates an account and sign-in establishes a session that routes you into the authenticated app flow.
-result: pending
+result: pass
 
 ### 4. Forgot password sends reset email
 expected: On the forgot-password screen, submitting a valid email triggers Supabase password reset email (or a clear success message), without app errors.
@@ -40,19 +42,24 @@ result: pending
 
 ### 5. Route guarding works (auth vs app vs onboarding)
 expected: If signed out, navigating into `/(app)` bounces you to `/(auth)`. If signed in and onboarding not done, the app routes you into `/(onboarding)` until completed.
-result: pending
+result: skipped
+reason: "Blocked: cannot complete onboarding flow (see Test 6); home and post-onboarding routing not reachable."
 
 ### 6. Onboarding completion persists
 expected: Completing onboarding sets the local `onboarding_done` flag and you land on the home screen; restarting the app does not show onboarding again (while signed in).
-result: pending
+result: issue
+reported: "After the intro 4 slides, there's no button or ability to continue to the home screen, which doesn't allow the user to actually enter the app. Therefore, this feature cannot be tested as I am stuck in perpetually the intro 4 slides"
+severity: blocker
 
 ### 7. Home: Connect bank gated on email verification
 expected: On home, Connect bank is disabled (with copy) until the user’s `email_confirmed_at` is set; tapping resend triggers verification resend without crashing.
-result: pending
+result: skipped
+reason: "Blocked: cannot reach home — onboarding has no continue control (Test 6)."
 
 ### 8. Sign out clears session and local keys
 expected: Signing out returns you to auth flow and clears Supabase session; relaunching the app should not consider you authenticated, and onboarding/auth storage keys are cleared.
-result: pending
+result: skipped
+reason: "Blocked: cannot reach home / full app shell while stuck on onboarding slides (Test 6)."
 
 ### 9. DB migration present for Phase 1 schema + RLS policies
 expected: `supabase/migrations/20260418120000_phase1_core.sql` exists and includes Phase 1 tables with RLS enabled and user-scoped policies (profiles, bank_links, transactions, budgets, goals, insights).
@@ -61,10 +68,10 @@ result: pass
 ## Summary
 
 total: 9
-passed: 2
-issues: 0
-pending: 7
-skipped: 0
+passed: 4
+issues: 1
+pending: 1
+skipped: 3
 
 ## Gaps
 
@@ -122,4 +129,12 @@ skipped: 0
     - "Use anon/publishable key for EXPO_PUBLIC_SUPABASE_ANON_KEY."
     - "Add client-side guard against secret key prefixes."
     - "Re-run forgot-password UAT after env correction."
+
+- truth: "After intro onboarding slides, user can complete onboarding and land on home (onboarding_done set, not stuck on carousel)."
+  status: failed
+  reason: "User reported: After the intro 4 slides, there's no button or ability to continue to the home screen, which doesn't allow the user to actually enter the app. Therefore, this feature cannot be tested as I am stuck in perpetually the intro 4 slides"
+  severity: blocker
+  test: 6
+  artifacts: []
+  missing: []
 
