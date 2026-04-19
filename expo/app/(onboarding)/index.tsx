@@ -11,7 +11,6 @@ import {
   StyleSheet,
   Text,
   View,
-  type ViewToken,
 } from 'react-native';
 
 type Slide = { id: string; title: string; body: string };
@@ -29,21 +28,32 @@ export default function OnboardingCarouselScreen() {
   const [index, setIndex] = useState(0);
   const listRef = useRef<FlatList<Slide>>(null);
 
-  const onViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      const first = viewableItems[0];
-      if (first?.index != null) setIndex(first.index);
-    },
+  const getItemLayout = useRef(
+    (_: unknown, i: number) => ({
+      length: width,
+      offset: width * i,
+      index: i,
+    }),
   ).current;
 
-  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 }).current;
-
-  /** Keep footer index in sync with visible page; viewability alone can miss the last slide. */
-  function onMomentumScrollEnd(e: NativeSyntheticEvent<NativeScrollEvent>) {
-    const x = e.nativeEvent.contentOffset.x;
+  /** Keep footer in sync when the user swipes (buttons use explicit Next / Continue). */
+  function syncIndexFromOffset(x: number) {
     const nextIndex = Math.round(x / Math.max(width, 1));
     const clamped = Math.min(Math.max(nextIndex, 0), SLIDES.length - 1);
     setIndex(clamped);
+  }
+
+  function onMomentumScrollEnd(e: NativeSyntheticEvent<NativeScrollEvent>) {
+    syncIndexFromOffset(e.nativeEvent.contentOffset.x);
+  }
+
+  function onScrollToIndexFailed(info: {
+    index: number;
+    highestMeasuredFrameIndex: number;
+    averageItemLength: number;
+  }) {
+    const offset = info.averageItemLength * info.index;
+    listRef.current?.scrollToOffset({ offset, animated: true });
   }
 
   const renderItem: ListRenderItem<Slide> = ({ item }) => (
@@ -60,7 +70,16 @@ export default function OnboardingCarouselScreen() {
 
   function onBack() {
     if (index <= 0) return;
-    listRef.current?.scrollToIndex({ index: index - 1, animated: true });
+    const prev = index - 1;
+    setIndex(prev);
+    listRef.current?.scrollToIndex({ index: prev, animated: true });
+  }
+
+  function onNext() {
+    if (index >= SLIDES.length - 1) return;
+    const next = index + 1;
+    setIndex(next);
+    listRef.current?.scrollToIndex({ index: next, animated: true });
   }
 
   const isLast = index === SLIDES.length - 1;
@@ -71,13 +90,15 @@ export default function OnboardingCarouselScreen() {
         ref={listRef}
         data={SLIDES}
         horizontal
+        getItemLayout={getItemLayout}
         keyExtractor={(item) => item.id}
         onMomentumScrollEnd={onMomentumScrollEnd}
-        onViewableItemsChanged={onViewableItemsChanged}
+        onScrollToIndexFailed={onScrollToIndexFailed}
         pagingEnabled
         renderItem={renderItem}
         showsHorizontalScrollIndicator={false}
-        viewabilityConfig={viewabilityConfig}
+        snapToInterval={width}
+        decelerationRate="fast"
       />
       <View style={styles.footer}>
         {index > 0 ? (
@@ -95,7 +116,9 @@ export default function OnboardingCarouselScreen() {
             <Text style={styles.primaryText}>Continue</Text>
           </Pressable>
         ) : (
-          <View style={styles.primarySpacer} />
+          <Pressable accessibilityRole="button" onPress={onNext} style={styles.primary}>
+            <Text style={styles.primaryText}>Next</Text>
+          </Pressable>
         )}
       </View>
     </View>
@@ -125,6 +148,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
   },
-  primarySpacer: { minWidth: 100 },
   primaryText: { color: '#fff', fontWeight: '700' },
 });
