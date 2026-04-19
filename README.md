@@ -28,3 +28,7 @@ From `expo/`:
 From `expo/`:
 
 - `npm test`
+
+## Security — Plaid prototype
+
+Plaid secrets (`PLAID_SECRET`, `PLAID_ACCESS_TOKEN`) live only in **Supabase Edge Function secrets** and your Plaid dashboard — never add `PLAID_SECRET` to `expo/.env`. The Expo app calls Edge Functions with the user JWT; access tokens stay in Postgres tables that have **no** authenticated RLS policies.

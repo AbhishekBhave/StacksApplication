@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-04-17)
 
 **Core value:** Help young adults make better day-to-day spending decisions from real account data in a way that feels useful, engaging, and immediately actionable.  
-**Current focus:** Phase 1 verification — app keys in local `expo/.env`; schema can be applied via Supabase MCP (`apply_migration`) or CLI `db push` after link
+**Current focus:** Phase 2 human verification — configure Plaid secrets on Supabase Edge, use a **development build** for Plaid native modules, run sandbox link + refresh + disconnect UAT (`02-VERIFICATION.md`)
 
 ## Initialization Status
 
@@ -17,16 +17,16 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 
 ## Current Phase Snapshot
 
-- Phase: 1
-- Name: Auth, Data Model, Security Baseline
-- Outcome target: secure app foundation with per-user data protection and authentication
-- Plans: 5 (01–05) — **implementation commits done** for Plan 05 auth/env closure
-- Status: Phase 1 UAT round 2 **complete** — Test 6 (onboarding) **pass** after Next/Continue footer fix (`a95e77c`); tests 4–5, 7–8 still skipped (optional re-run)
-- Next: optionally re-verify skipped UAT items (route guard, forgot password, home email gate, sign-out); apply Supabase migration to linked project; refresh `01-VERIFICATION.md` when ready
+- Phase: 2
+- Name: Plaid Connection and Transaction Pipeline
+- Outcome target: reliably connect one bank account and maintain fresh transaction data
+- Plans: 5 (`02-PLAN-01` … `02-PLAN-05`) — **executed** with `02-PLAN-*-SUMMARY.md` written; `02-VERIFICATION.md` status **human_needed** (Plaid sandbox UAT + Edge secrets)
+- Status: Phase 2 code + migration + Edge deploy landed in repo; **next:** set `PLAID_*` secrets on Supabase project, run dev build, complete human checklist in `02-VERIFICATION.md`, then `/gsd-verify-work 2` or reply **approved** after testing to close verification
+- Next: `/gsd-verify-work 2` after sandbox link/refresh/disconnect checks; then `/gsd-plan-phase 3` when ready for budgets/goals
 
 ## Recent decisions
 
-- **Phase 2 planned (2026-04-19):** five executable plans (`02-PLAN-01` … `02-PLAN-05`) plus `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, and `02-UI-SPEC.md` in `.planning/phases/02-plaid-connection-and-transaction-pipeline/`. Next execution step: `/gsd-execute-phase 2`.
+- **Phase 2 executed (2026-04-19):** migration `20260419140000_phase2_plaid.sql`, four JWT-gated Plaid Edge Functions (deployed to linked project), Expo Plaid Link flow (`pre-plaid`, `bank`, `transactions`), logging/env gates (`expo/lib/logger.ts`, `check-env.js`). Pending: operator `supabase secrets set` for Plaid + device UAT per `02-VERIFICATION.md`.
 - Expo app directory created as `stacks-expo` then renamed to `expo/` because `create-expo-app` rejects the package name `expo`.
 - Plans 03 and 04 shipped in one commit to avoid a broken intermediate home route.
 - Plan 05 adds fail-fast env guards in client bootstrap and prestart/pretest checks via `expo/scripts/check-env.js`.
@@ -34,4 +34,4 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 - Onboarding carousel uses explicit **Next** / **Continue** with `scrollToIndex` + `getItemLayout` so users are not stuck without a primary CTA.
 
 ---
-*State updated: 2026-04-19 after UAT Test 6 verified (onboarding fix)*
+*State updated: 2026-04-19 after Phase 2 execute-phase (implementation + deploy + verification artifact)*

@@ -1,8 +1,8 @@
 import { clearLocalAuthStorage } from '@/lib/auth-storage';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
-import { router } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -17,22 +17,37 @@ export default function HomeScreen() {
   const [busy, setBusy] = useState(false);
   const [connectHint, setConnectHint] = useState<string | null>(null);
   const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const [hasActiveBank, setHasActiveBank] = useState(false);
 
   const refreshUser = useCallback(async () => {
     const { data: { user: u } } = await supabase.auth.getUser();
     setUser(u);
+    if (u?.id) {
+      const { data: link } = await supabase
+        .from('bank_links')
+        .select('id')
+        .eq('user_id', u.id)
+        .eq('status', 'active')
+        .maybeSingle();
+      setHasActiveBank(!!link);
+    } else {
+      setHasActiveBank(false);
+    }
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      await refreshUser();
-      if (!cancelled) setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [refreshUser]);
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      setLoading(true);
+      void (async () => {
+        await refreshUser();
+        if (!cancelled) setLoading(false);
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, [refreshUser]),
+  );
 
   async function onSignOut() {
     setBusy(true);
@@ -53,7 +68,15 @@ export default function HomeScreen() {
       return;
     }
     setConnectHint(null);
-    router.push('/(app)/connect-bank-placeholder');
+    if (hasActiveBank) {
+      router.push('/(app)/transactions');
+    } else {
+      router.push('/(app)/pre-plaid');
+    }
+  }
+
+  function onManageBank() {
+    router.push('/(app)/bank');
   }
 
   async function onResendVerification() {
@@ -101,9 +124,22 @@ export default function HomeScreen() {
         onPress={onConnectBank}
         style={styles.connectCard}
       >
-        <Text style={styles.connectTitle}>Connect bank</Text>
-        <Text style={styles.connectSub}>Link an account to unlock spending context.</Text>
+        <Text style={styles.connectTitle}>
+          {hasActiveBank ? 'View transactions' : 'Connect bank'}
+        </Text>
+        <Text style={styles.connectSub}>
+          {hasActiveBank
+            ? 'Review recent activity from your linked account.'
+            : 'Link an account to unlock spending context.'}
+        </Text>
       </Pressable>
+
+      {user.email_confirmed_at ? (
+        <Pressable accessibilityRole="button" onPress={onManageBank} style={styles.secondaryCard}>
+          <Text style={styles.secondaryTitle}>Bank & linked account</Text>
+          <Text style={styles.secondarySub}>Manage connection, disconnect, or replace.</Text>
+        </Pressable>
+      ) : null}
 
       {connectHint ? (
         <View style={styles.banner}>
@@ -138,6 +174,15 @@ const styles = StyleSheet.create({
   },
   connectTitle: { color: '#fff', fontSize: 18, fontWeight: '700' },
   connectSub: { color: '#e0e0e0', fontSize: 15 },
+  secondaryCard: {
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    gap: 4,
+  },
+  secondaryTitle: { fontSize: 16, fontWeight: '700' },
+  secondarySub: { fontSize: 14, color: '#555' },
   banner: {
     borderWidth: 1,
     borderColor: '#ccc',
