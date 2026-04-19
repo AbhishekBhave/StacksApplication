@@ -20,14 +20,16 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 - Phase: 1
 - Name: Auth, Data Model, Security Baseline
 - Outcome target: secure app foundation with per-user data protection and authentication
-- Plans: 4 (01–04) — **implementation commits done**; Plan 02 schema apply via **Supabase MCP** (e.g. `apply_migration` with `supabase/migrations/20260418120000_phase1_core.sql`) or `npx supabase db push` after `supabase link`
-- Status: Verification — confirm remote DB matches migration + run UAT with real `expo/.env`
-- Next: Apply migration through MCP if not already; `/gsd-verify-work 1` or update `01-VERIFICATION.md` after checks
+- Plans: 5 (01–05) — **implementation commits done** for Plan 05 auth/env closure
+- Status: Verification in progress — env-gated checks now block startup/tests until valid `expo/.env` values are present
+- Next: set valid `EXPO_PUBLIC_SUPABASE_URL` + anon/publishable key in `expo/.env`, run `cd expo && npm run start -- --clear`, then complete auth UAT (`sign up/sign in`, `forgot password`)
 
 ## Recent decisions
 
 - Expo app directory created as `stacks-expo` then renamed to `expo/` because `create-expo-app` rejects the package name `expo`.
 - Plans 03 and 04 shipped in one commit to avoid a broken intermediate home route.
+- Plan 05 adds fail-fast env guards in client bootstrap and prestart/pretest checks via `expo/scripts/check-env.js`.
+- Secret/service-role Supabase keys are now hard-rejected in client runtime and mapped to actionable auth error copy.
 
 ---
-*State updated: 2026-04-18 after /gsd-execute-phase 1*
+*State updated: 2026-04-19 after 01-PLAN-05 execution*
