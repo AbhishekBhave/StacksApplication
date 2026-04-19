@@ -21,8 +21,8 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 - Name: Auth, Data Model, Security Baseline
 - Outcome target: secure app foundation with per-user data protection and authentication
 - Plans: 5 (01–05) — **implementation commits done** for Plan 05 auth/env closure
-- Status: Verification in progress — env-gated checks now block startup/tests until valid `expo/.env` values are present
-- Next: set valid `EXPO_PUBLIC_SUPABASE_URL` + anon/publishable key in `expo/.env`, run `cd expo && npm run start -- --clear`, then complete auth UAT (`sign up/sign in`, `forgot password`)
+- Status: Phase 1 UAT round 2 **complete** — Test 6 (onboarding) **pass** after Next/Continue footer fix (`a95e77c`); tests 4–5, 7–8 still skipped (optional re-run)
+- Next: optionally re-verify skipped UAT items (route guard, forgot password, home email gate, sign-out); apply Supabase migration to linked project; refresh `01-VERIFICATION.md` when ready
 
 ## Recent decisions
 
@@ -30,6 +30,7 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 - Plans 03 and 04 shipped in one commit to avoid a broken intermediate home route.
 - Plan 05 adds fail-fast env guards in client bootstrap and prestart/pretest checks via `expo/scripts/check-env.js`.
 - Secret/service-role Supabase keys are now hard-rejected in client runtime and mapped to actionable auth error copy.
+- Onboarding carousel uses explicit **Next** / **Continue** with `scrollToIndex` + `getItemLayout` so users are not stuck without a primary CTA.
 
 ---
-*State updated: 2026-04-19 after 01-PLAN-05 execution*
+*State updated: 2026-04-19 after UAT Test 6 verified (onboarding fix)*

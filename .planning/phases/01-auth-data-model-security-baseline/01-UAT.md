@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: complete
 phase: 01-auth-data-model-security-baseline
 source:
   - 01-PLAN-01-SUMMARY.md
@@ -8,7 +8,7 @@ source:
   - 01-PLAN-04-SUMMARY.md
   - 01-PLAN-05-SUMMARY.md
 started: 2026-04-19T14:43:59Z
-updated: 2026-04-19T23:30:00Z
+updated: 2026-04-19T23:55:00Z
 ---
 
 ## Current Test
@@ -37,24 +37,22 @@ reason: "User chose skip during re-verification round."
 ### 5. Route guarding works (auth vs app vs onboarding)
 expected: If signed out, navigating into `/(app)` bounces you to `/(auth)`. If signed in and onboarding not done, the app routes you into `/(onboarding)` until completed.
 result: skipped
-reason: "Blocked: cannot complete onboarding flow (see Test 6); home and post-onboarding routing not reachable."
+reason: "Not re-run this session; earlier skip was due to Test 6 blocker (onboarding). Onboarding fix verified separately — re-run this test when convenient."
 
 ### 6. Onboarding completion persists
 expected: Completing onboarding sets the local `onboarding_done` flag and you land on the home screen; restarting the app does not show onboarding again (while signed in).
-result: issue
-reported: "After the intro 4 slides, there's no button or ability to continue to the home screen, which doesn't allow the user to actually enter the app. Therefore, this feature cannot be tested as I am stuck in perpetually the intro 4 slides"
-severity: blocker
-follow_up: "Code fix: sync carousel index on onMomentumScrollEnd so Continue appears on the last slide — re-verify Test 6 on device."
+result: pass
+verified_note: "User confirmed 2026-04-19 after explicit Next/Continue + scrollToIndex fix (see a95e77c)."
 
 ### 7. Home: Connect bank gated on email verification
 expected: On home, Connect bank is disabled (with copy) until the user’s `email_confirmed_at` is set; tapping resend triggers verification resend without crashing.
 result: skipped
-reason: "Blocked: cannot reach home — onboarding has no continue control (Test 6)."
+reason: "Not re-run this session; earlier skip was due to onboarding blocker — re-run from home when convenient."
 
 ### 8. Sign out clears session and local keys
 expected: Signing out returns you to auth flow and clears Supabase session; relaunching the app should not consider you authenticated, and onboarding/auth storage keys are cleared.
 result: skipped
-reason: "Blocked: cannot reach home / full app shell while stuck on onboarding slides (Test 6)."
+reason: "Not re-run this session; earlier skip was due to onboarding blocker — re-run from home when convenient."
 
 ### 9. DB migration present for Phase 1 schema + RLS policies
 expected: `supabase/migrations/20260418120000_phase1_core.sql` exists and includes Phase 1 tables with RLS enabled and user-scoped policies (profiles, bank_links, transactions, budgets, goals, insights).
@@ -63,8 +61,8 @@ result: pass
 ## Summary
 
 total: 9
-passed: 4
-issues: 1
+passed: 5
+issues: 0
 pending: 0
 skipped: 4
 
@@ -126,7 +124,7 @@ skipped: 4
     - "Re-run forgot-password UAT after env correction."
 
 - truth: "After intro onboarding slides, user can complete onboarding and land on home (onboarding_done set, not stuck on carousel)."
-  status: failed
+  status: resolved
   reason: "User reported: After the intro 4 slides, there's no button or ability to continue to the home screen, which doesn't allow the user to actually enter the app. Therefore, this feature cannot be tested as I am stuck in perpetually the intro 4 slides"
   severity: blocker
   test: 6
@@ -137,4 +135,9 @@ skipped: 4
   missing:
     - "Sync slide index from onMomentumScrollEnd using contentOffset / page width (implemented)."
   debug_session: ".planning/debug/onboarding-stuck-last-slide.md"
+  resolution_verified: "2026-04-19 — user confirmed onboarding works after explicit Next + scrollToIndex (a95e77c)."
+
+### UAT round 2 — Test 6 closure
+
+User confirmed the onboarding carousel completes and **Continue** reaches home after the footer fix (`a95e77c`).
 
