@@ -1,5 +1,5 @@
 ---
-status: testing
+status: diagnosed
 phase: 01-auth-data-model-security-baseline
 source:
   - 01-PLAN-01-SUMMARY.md
@@ -8,19 +8,12 @@ source:
   - 01-PLAN-04-SUMMARY.md
   - 01-PLAN-05-SUMMARY.md
 started: 2026-04-19T14:43:59Z
-updated: 2026-04-19T23:00:00Z
+updated: 2026-04-19T23:30:00Z
 ---
 
 ## Current Test
-<!-- OVERWRITE each test - shows where we are -->
 
-number: 4
-name: Forgot password sends reset email
-expected: |
-  On the forgot-password screen, submitting a valid email triggers Supabase password reset email (or a clear success message), without app errors.
-awaiting: user response
-
-_Note: Tests 5, 7, and 8 are skipped for this round (blocked by Test 6 — onboarding cannot be completed)._
+[testing complete]
 
 ## Tests
 
@@ -38,7 +31,8 @@ result: pass
 
 ### 4. Forgot password sends reset email
 expected: On the forgot-password screen, submitting a valid email triggers Supabase password reset email (or a clear success message), without app errors.
-result: pending
+result: skipped
+reason: "User chose skip during re-verification round."
 
 ### 5. Route guarding works (auth vs app vs onboarding)
 expected: If signed out, navigating into `/(app)` bounces you to `/(auth)`. If signed in and onboarding not done, the app routes you into `/(onboarding)` until completed.
@@ -50,6 +44,7 @@ expected: Completing onboarding sets the local `onboarding_done` flag and you la
 result: issue
 reported: "After the intro 4 slides, there's no button or ability to continue to the home screen, which doesn't allow the user to actually enter the app. Therefore, this feature cannot be tested as I am stuck in perpetually the intro 4 slides"
 severity: blocker
+follow_up: "Code fix: sync carousel index on onMomentumScrollEnd so Continue appears on the last slide — re-verify Test 6 on device."
 
 ### 7. Home: Connect bank gated on email verification
 expected: On home, Connect bank is disabled (with copy) until the user’s `email_confirmed_at` is set; tapping resend triggers verification resend without crashing.
@@ -70,8 +65,8 @@ result: pass
 total: 9
 passed: 4
 issues: 1
-pending: 1
-skipped: 3
+pending: 0
+skipped: 4
 
 ## Gaps
 
@@ -135,6 +130,11 @@ skipped: 3
   reason: "User reported: After the intro 4 slides, there's no button or ability to continue to the home screen, which doesn't allow the user to actually enter the app. Therefore, this feature cannot be tested as I am stuck in perpetually the intro 4 slides"
   severity: blocker
   test: 6
-  artifacts: []
-  missing: []
+  root_cause: "Continue only renders when state index is on the last slide; index was updated only via FlatList onViewableItemsChanged with itemVisiblePercentThreshold 60. The final page often fails that threshold, so index stayed below the last index and the footer rendered primarySpacer instead of the Continue Pressable."
+  artifacts:
+    - path: "expo/app/(onboarding)/index.tsx"
+      issue: "Footer Continue gated by isLast from viewability-only index; last slide may not register as viewable."
+  missing:
+    - "Sync slide index from onMomentumScrollEnd using contentOffset / page width (implemented)."
+  debug_session: ".planning/debug/onboarding-stuck-last-slide.md"
 

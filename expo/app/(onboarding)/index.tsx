@@ -5,6 +5,8 @@ import {
   Dimensions,
   FlatList,
   ListRenderItem,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Pressable,
   StyleSheet,
   Text,
@@ -36,6 +38,14 @@ export default function OnboardingCarouselScreen() {
 
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 }).current;
 
+  /** Keep footer index in sync with visible page; viewability alone can miss the last slide. */
+  function onMomentumScrollEnd(e: NativeSyntheticEvent<NativeScrollEvent>) {
+    const x = e.nativeEvent.contentOffset.x;
+    const nextIndex = Math.round(x / Math.max(width, 1));
+    const clamped = Math.min(Math.max(nextIndex, 0), SLIDES.length - 1);
+    setIndex(clamped);
+  }
+
   const renderItem: ListRenderItem<Slide> = ({ item }) => (
     <View style={[styles.slide, { width }]}>
       <Text style={styles.slideTitle}>{item.title}</Text>
@@ -62,6 +72,7 @@ export default function OnboardingCarouselScreen() {
         data={SLIDES}
         horizontal
         keyExtractor={(item) => item.id}
+        onMomentumScrollEnd={onMomentumScrollEnd}
         onViewableItemsChanged={onViewableItemsChanged}
         pagingEnabled
         renderItem={renderItem}
