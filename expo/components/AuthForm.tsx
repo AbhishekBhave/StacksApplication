@@ -13,6 +13,21 @@ import {
 
 type AuthMode = 'signup' | 'signin';
 
+function mapAuthError(message: string) {
+  const normalized = message.toLowerCase();
+  const looksLikeKeyError =
+    normalized.includes('secret api key') ||
+    normalized.includes('invalid api key') ||
+    normalized.includes('service_role') ||
+    normalized.includes('forbidden');
+
+  if (looksLikeKeyError) {
+    return 'Client is using a secret/service key. Set EXPO_PUBLIC_SUPABASE_ANON_KEY to the anon/publishable key in expo/.env, then restart Expo with "npm run start -- --clear".';
+  }
+
+  return message;
+}
+
 export function AuthForm() {
   const [mode, setMode] = useState<AuthMode>('signup');
   const [email, setEmail] = useState('');
@@ -56,7 +71,7 @@ export function AuthForm() {
       }
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Something went wrong.';
-      setError(message);
+      setError(mapAuthError(message));
     } finally {
       setLoading(false);
     }

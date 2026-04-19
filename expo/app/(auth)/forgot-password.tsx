@@ -9,6 +9,21 @@ import {
   View,
 } from 'react-native';
 
+function mapAuthError(message: string) {
+  const normalized = message.toLowerCase();
+  const looksLikeKeyError =
+    normalized.includes('secret api key') ||
+    normalized.includes('invalid api key') ||
+    normalized.includes('service_role') ||
+    normalized.includes('forbidden');
+
+  if (looksLikeKeyError) {
+    return 'Client is using a secret/service key. Set EXPO_PUBLIC_SUPABASE_ANON_KEY to the anon/publishable key in expo/.env, then restart Expo with "npm run start -- --clear".';
+  }
+
+  return message;
+}
+
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -33,7 +48,7 @@ export default function ForgotPasswordScreen() {
       setMessage('Check your email');
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Request failed.';
-      setError(msg);
+      setError(mapAuthError(msg));
     } finally {
       setLoading(false);
     }
