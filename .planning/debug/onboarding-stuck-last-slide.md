@@ -14,8 +14,11 @@ Footer `Continue` only renders when `index === SLIDES.length - 1` (`isLast`).
 
 ## Fix direction (applied)
 
-- Sync `index` from `onMomentumScrollEnd` using `contentOffset.x / width` so the footer matches the visible page after each swipe.
+1. Sync `index` from `onMomentumScrollEnd` when the user swipes (`contentOffset.x / width`).
+2. **Primary fix:** Footer always shows a primary action — **Next** (not an empty spacer) calls `scrollToIndex` with `getItemLayout`; **Continue** on the last slide finishes onboarding. No reliance on viewability to reveal the CTA.
+3. `onScrollToIndexFailed` falls back to `scrollToOffset`.
+4. `snapToInterval={width}` and `decelerationRate="fast"` for more predictable horizontal paging on some Android builds.
 
 ## Follow-up
 
-- Re-run UAT Test 6 on device/simulator after pulling the fix.
+- Re-run UAT Test 6 on device/simulator after pulling commit `a95e77c` (or later).
