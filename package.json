@@ -1,0 +1,12 @@
+{
+  "name": "stacks-prototype",
+  "private": true,
+  "scripts": {
+    "start": "cd ./expo && npm run start",
+    "start:clear": "cd ./expo && npm run start -- --clear",
+    "android": "cd ./expo && npm run android",
+    "ios": "cd ./expo && npm run ios",
+    "web": "cd ./expo && npm run web",
+    "test": "cd ./expo && npm run test"
+  }
+}
